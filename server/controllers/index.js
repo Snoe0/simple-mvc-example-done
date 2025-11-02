@@ -101,8 +101,20 @@ const hostPage3 = (req, res) => {
   res.render('page3');
 };
 
-const hostPage4 = (req, res) => {
-  res.render('page4');
+// Function for rendering the page4 template
+// Page4 has a loop that iterates over an array of dogs
+const hostPage4 = async (req, res) => {
+  try {
+    // Find all dogs in the Dog database
+    const docs = await Dog.find({}).lean().exec();
+
+    // Once we get back the docs array, we can send it to page4
+    return res.render('page4', { dogs: docs });
+  } catch (err) {
+    // If our database returns an error, log it and send back an error message
+    console.log(err);
+    return res.status(500).json({ error: 'failed to find dogs' });
+  }
 };
 
 // Get name will return the name of the last added cat.
@@ -301,8 +313,6 @@ const setDog = async (req, res) => {
 
 
   const newDog = new Dog(dogData);
-
-
   try {
     await newDog.save();
     return res.status(201).json({
